@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 You need:
-* [NodeJS and NPM](https://nodejs.org/) to install the dependencies for this project
+* [NodeJS and NPM](https://nodejs.org/) to install the dependencies for this project (recommended version 6 or higher)
 
 
 ### Installing
@@ -25,12 +25,6 @@ Install the dependencies in the newly created folder
 ```
 cd batch-file-renamer
 npm install
-```
-
-Edit the path and renaming function to your needs *(index.js)*
-```javascript
-const path = 'E:\\Some\\Folder';
-const newName = (oldName) => oldName.replace('.en.srt', '.srt');
 ```
 
 Run the program
