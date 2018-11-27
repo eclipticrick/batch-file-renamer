@@ -26,20 +26,16 @@ module.exports =  {
             if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
                 console.log('new names:');
                 console.log('');
-                return new Promise(() => {
-                    fs.readdir(path, (err, files) => {
-                        files.forEach(fileName => {
-                            fs.rename(path + '/' + fileName, path + '/' + newName(fileName), function (err) {
-                                if (err) throw err;
-                                console.info(` |--${newName(fileName)}`);
-                            })
+
+                fs.readdir(path, (err, files) => {
+                    files.forEach(fileName => {
+                        fs.rename(path + '/' + fileName, path + '/' + newName(fileName), function (err) {
+                            if (err) throw err;
+                            console.info(` |--${newName(fileName)}`);
                         })
                     })
                 })
-
-            } else {
-                console.warn('renaming canceled')
-            }
+            } else console.warn('renaming canceled');
             rl.close();
         })
     }
