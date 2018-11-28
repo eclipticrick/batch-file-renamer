@@ -8,17 +8,32 @@
  */
 module.exports = {
     default: {
-        path: 'C:\\Users\\wes_v\\Desktop\\OPIN',
+        path: 'D:\\Projects\\npm\\batch-renamer\\tmp',
         renameFolders: false,
         renameFiles: false
     },
     actions: {
-        replace: {
+        replaceFirst: {
             fn: (oldName) => (replaceString, withString) => oldName.replace(replaceString, withString),
+            args: ['string to replace', 'replacement string']
+        },
+        replace: {
+            fn: (oldName) => (replaceString, withString) => {
+                const re = new RegExp(replaceString, 'g');
+                return oldName.replace(re, withString);
+            },
             args: ['string to replace', 'replacement string']
         },
         reverse: {
             fn: (oldName) => () => oldName.split('').reverse().join(''),
+            args: []
+        },
+        toLowerCase: {
+            fn: (oldName) => () => oldName.toLowerCase(),
+            args: []
+        },
+        toUpperCase: {
+            fn: (oldName) => () => oldName.toUpperCase(),
             args: []
         },
         append:  {
@@ -28,6 +43,6 @@ module.exports = {
         prepend: {
             fn: (oldName) => (string) => string + oldName,
             args: ['string to prepend']
-        },
+        }
     }
 };

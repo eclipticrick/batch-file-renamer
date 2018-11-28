@@ -4,12 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "jest --verbose"
   },
   "author": "Wesley Veenendaal",
   "license": "ISC",
   "dependencies": {
     "better-console": "^1.0.1"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0"
   }
 }

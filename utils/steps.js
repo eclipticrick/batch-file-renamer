@@ -3,14 +3,18 @@ const config = require('../config');
 const { path, renameFiles, renameFolders } = config.default;
 const { state } = require('./state');
 
-module.exports = {
+
+const steps = {
     [1]: {
         question: () => `Specify a folder where you want to rename files (default: '${path}')`,
         action: (answer) => handler.setPath(answer)
     },
     [2]: {
         question: () => `Is this path correct? (y/n) '${state.path}'`,
-        action: (answer) => handler.confirmPath(answer)
+        action: (answer) => {
+            handler.confirmPath(answer);
+            handler.showListOfFilesAndFoldersBeforeReplacement();
+        }
     },
     [3]: {
         question: () => `Do you want to rename files or folders or both? (default: ${renameFiles && renameFolders ? 'both' : renameFiles ? 'files' : renameFolders ? 'folders' : 'nothing'})`,
@@ -29,16 +33,16 @@ module.exports = {
         action: (answer) => handler.setParameterForAction(answer)
     },
     [7]: {
-        question: () => `Is '${state.args[state.args.length - 1]}' the '${config.actions[state.action].args[state.args.length - 1]}'`,
+        question: () => `Is '${state.args[state.args.length - 1]}' the '${config.actions[state.action].args[state.args.length - 1]}' (y/n)`,
         action: (answer) => handler.confirmParameterForAction(answer)
     },
     [8]: {
-        question: () => `This is what it will look like after? agree?? (y/n)`,
-        action: (answer) => console.log('not implemented yet')
+        question: () => `These are the new names after the replacement, do you want to continue? (y/n) ${handler.showListOfReplacedNames()}`,
+        action: (answer) => handler.confirmReplacedNames(answer)
     },
     [9]: {
-        question: () => `There ya go, done`,
-        action: (answer) => console.log('not implemented yet')
+        question: () => `The --files and folders-- have been renamed`,
+        action: () => handler.showListOfResults()
     },
     [10]: {
         question: () => `
@@ -46,6 +50,20 @@ module.exports = {
             Type 'restart' to rename more files or folders
             Type 'exit' to stop this application
         `,
-        action: (answer) => console.log('not implemented yet')
+        action: (answer) => handler.undoRestartOrExit(answer)
+    },
+    [999]: {
+        question: () => ``,
+        action: () => process.exit()
     },
 };
+
+const getStep = (nr) => {
+    if (steps[nr]) {
+        return steps[nr];
+    } else {
+        return steps[999];
+    }
+};
+
+module.exports = { steps, getStep };
