@@ -2,7 +2,7 @@
 const { log, info } = require('better-console');
 const helpers = require('./helpers');
 const config = require('../config');
-const { state, clearState } = require('./state');
+const { getState, clearState } = require('./state');
 const defaultFileSystem = require('./fileSystem');
 
 module.exports = {
@@ -15,14 +15,14 @@ module.exports = {
                 if (!fileSystem.pathIsAValidFolder(defaultPath)) {
                     return `The specified default path in 'config.js' is not valid (${defaultPath})`;
                 } else {
-                    state.path = defaultPath;
+                    getState().path = defaultPath;
                 }
             }
         } else {
             if (!fileSystem.pathIsAValidFolder(givenPath)) {
                 return `The given path is not valid ('${givenPath}')`;
             } else {
-                state.path = givenPath;
+                getState().path = givenPath;
             }
         }
         return null;
@@ -32,7 +32,7 @@ module.exports = {
         if (confirmation === true) {
             return null
         } else if (confirmation === false) {
-            state.path = null;
+            getState().path = null;
             return 1
         } else {
             return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
@@ -40,16 +40,16 @@ module.exports = {
     },
     showListOfFilesAndFoldersBeforeReplacement: (fileSystem = defaultFileSystem) => {
         log('this path contains the following folders and files:');
-        fileSystem.getFolders(state.path).forEach(folder => info(folder));
-        fileSystem.getFiles(state.path).forEach(file => log(file));
+        fileSystem.getFolders(getState().path).forEach(folder => info(folder));
+        fileSystem.getFiles(getState().path).forEach(file => log(file));
     },
     confirmReplaceables: (answer) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
             return null
         } else if (confirmation === false) {
-            state.files = null;
-            state.folders = null;
+            getState().files = null;
+            getState().folders = null;
             return 3
         } else {
             return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
@@ -59,19 +59,19 @@ module.exports = {
         answer = answer.toLowerCase();
         if (!helpers.stringIsEmpty(answer)) {
             if (answer === 'files') {
-                state.files = true;
+                getState().files = true;
             } else if (answer === 'folders') {
-                state.folders = true;
+                getState().folders = true;
             } else if (answer === 'both') {
-                state.files = true;
-                state.folders = true;
+                getState().files = true;
+                getState().folders = true;
             } else {
                 return `'${answer}' is not a valid answer, please answer with 'files', 'folders' or 'both'`
             }
         } else {
-            if (config.default.renameFiles) state.files = true;
-            if (config.default.renameFolders) state.folders = true;
-            if (!state.files && !state.folders) {
+            if (config.default.renameFiles) getState().files = true;
+            if (config.default.renameFolders) getState().folders = true;
+            if (!getState().files && !getState().folders) {
                 return `the default action is to rename 'nothing'... please type 'files', 'folders' or 'both' so this program has something to do`
             }
         }
@@ -84,7 +84,7 @@ module.exports = {
         } else if (!possibleActions.includes(answer)) {
             return `'${answer}' is not a valid action (be aware, it's case sensitive)`
         } else {
-            state.action = answer;
+            getState().action = answer;
             if (!config.actions[answer].args) {
                 return 8
             } else {
@@ -97,66 +97,108 @@ module.exports = {
         }
     },
     setParameterForAction: (answer) => {
-        state.args.push(answer);
+        getState().args.push(answer);
         return null;
     },
     confirmParameterForAction: (answer) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
-            const amountOfNeededParams = config.actions[state.action].args.length;
-            const amountOfProvidedParams = state.args.length;
+            const amountOfNeededParams = config.actions[getState().action].args.length;
+            const amountOfProvidedParams = getState().args.length;
             if (amountOfNeededParams !== amountOfProvidedParams) {
                 return 6
             }
             return null
         } else if (confirmation === false) {
-            state.args.pop();
+            getState().args.pop();
             return 6
         } else {
             return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
         }
     },
     showListOfReplacedNames: (fileSystem = defaultFileSystem) => {
-        if(state.folders) logList('folders', fileSystem.getFolders(state.path));
-        if(state.files) logList('files', fileSystem.getFiles(state.path));
+        if(getState().folders) logList('folders', fileSystem.getFolders(getState().path));
+        if(getState().files) logList('files', fileSystem.getFiles(getState().path));
 
         function logList(title, arr) {
             log(`\n${title}:`);
             log('[OLD]');
             arr.forEach((f, i) => log(i === arr.length - 1 ? '└──' : '├──', f));
             info('[NEW]');
-            arr.forEach((f, i) => info(i === arr.length - 1 ? '└──' : '├──', config.actions[state.action].fn(f)(...state.args)));
+            arr.forEach((f, i) => info(i === arr.length - 1 ? '└──' : '├──', config.actions[getState().action].fn(f)(...getState().args)));
         }
     },
-    confirmReplacedNames: (answer) => {
+    confirmReplacedNames: (answer, fileSystem = defaultFileSystem) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
-
-            // TODO
-            // Do everything
-            // backup
-            // replace
+            if (getState().folders) {
+                const oldFolderNames = fileSystem.getFolders(getState().path);
+                const newFolderNames = getState().backup.folders.forEach(f => config.actions[getState().action].fn(f)(...getState().args));
+                getState().backup.folders = [...oldFolderNames];
+                fileSystem.replaceFolders(oldFolderNames, newFolderNames);
+            }
+            if (getState().files) {
+                const oldFileNames = fileSystem.getFiles(getState().path);
+                const newFileNames = getState().backup.files.forEach(f => config.actions[getState().action].fn(f)(...getState().args));
+                getState().backup.files = [...oldFileNames];
+                fileSystem.replaceFiles(oldFileNames, newFileNames);
+            }
+            if(getState().folders) logList('renamed folders:', fileSystem.getFolders(getState().path));
+            if(getState().files) logList('renamed files:', fileSystem.getFiles(getState().path));
 
             return null
         } else if (confirmation === false) {
-            clearState();
-            return 1
+            return 5
         } else {
             return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
         }
     },
-    showListOfResults: (fileSystem = defaultFileSystem) => {
-        if(state.folders) logList('renamed folders:', fileSystem.getFolders(state.path));
-        if(state.files) logList('renamed files:', fileSystem.getFiles(state.path));
-
-        return null;
-
-        function logList(title, arr) {
-            log(`\n${title}`);
-            arr.forEach((f, i) => log(i === arr.length - 1 ? '└──' : '├──', f));
+    undoRestartOrExit: (answer) => {
+        answer = answer.toLowerCase();
+        const undoDis = helpers.levenshteinDistance(answer, 'undo');
+        if (undoDis > 0 && undoDis < 3) {
+            return null
+        } else if (answer === 'undo') {
+            undo();
+            return 1
+        } else if (answer === 'restart') {
+            clearState();
+            return 1
+        } else if (answer === 'exit') {
+            return 999
+        } else {
+            return `'${answer}' is not a valid answer, please answer with 'undo', 'restart' or 'exit'`
         }
     },
-    undoRestartOrExit: (answer) => {
-        // TODO
-    },
+    confirmUndo: (answer) => {
+        const confirmation = helpers.confirm(answer);
+        if (confirmation === true) {
+            undo();
+            return 1
+        } else if (confirmation === false) {
+            return 9
+        } else {
+            return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
+        }
+    }
 };
+
+function undo(fileSystem = defaultFileSystem) {
+    log('Reverting changes...');
+    if (getState().folders) {
+        fileSystem.replaceFolders(fileSystem.getFolders(getState().path), [...getState().backup.folders]);
+    }
+    if (getState().files) {
+        fileSystem.replaceFiles(fileSystem.getFiles(getState().path), [...getState().backup.files]);
+    }
+
+    if(getState().folders) logList('folders', fileSystem.getFolders(getState().path));
+    if(getState().files) logList('files', fileSystem.getFiles(getState().path));
+
+    info('The changes have been reverted!');
+}
+
+function logList(title, arr) {
+    log(`\n${title}`);
+    arr.forEach((f, i) => log(i === arr.length - 1 ? '└──' : '├──', f));
+}

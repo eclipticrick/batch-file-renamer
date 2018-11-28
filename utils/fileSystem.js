@@ -69,4 +69,16 @@ const createDummyFilesAndFolders = () => {
     }
 };
 
-module.exports = { pathIsAValidFolder, getFiles, getFolders, createDummyFilesAndFolders };
+const replaceFolders = (oldNames, newNames) => {
+
+    // TODO
+    //  |-- replace
+};
+
+const replaceFiles = (oldNames, newNames) => {
+
+    // TODO
+    //  |-- replace
+};
+
+module.exports = { pathIsAValidFolder, getFiles, getFolders, createDummyFilesAndFolders, replaceFolders, replaceFiles };

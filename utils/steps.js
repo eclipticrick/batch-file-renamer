@@ -1,7 +1,7 @@
 const handler = require('./stepHandler');
 const config = require('../config');
 const { path, renameFiles, renameFolders } = config.default;
-const { state } = require('./state');
+const { getState } = require('./state');
 
 
 const steps = {
@@ -10,7 +10,7 @@ const steps = {
         action: (answer) => handler.setPath(answer)
     },
     [2]: {
-        question: () => `Is this path correct? (y/n) '${state.path}'`,
+        question: () => `Is this path correct? (y/n) '${getState().path}'`,
         action: (answer) => {
             handler.confirmPath(answer);
             handler.showListOfFilesAndFoldersBeforeReplacement();
@@ -21,7 +21,7 @@ const steps = {
         action: (answer) => handler.setReplaceables(answer)
     },
     [4]: {
-        question: () => `So you want to rename ${state.files && state.folders ? 'both files and folders' : state.files ? 'only the files' : state.folders ? 'only the folders' : null} in ${state.path}? (y/n)`,
+        question: () => `So you want to rename ${getState().files && getState().folders ? 'both files and folders' : getState().files ? 'only the files' : getState().folders ? 'only the folders' : null} in ${getState().path}? (y/n)`,
         action: (answer) => handler.confirmReplaceables(answer)
     },
     [5]: {
@@ -29,28 +29,30 @@ const steps = {
         action: (answer) => handler.setAction(answer)
     },
     [6]: {
-        question: () => `The action '${state.action}' needs a '${config.actions[state.action].args[state.args.length]}'`,
+        question: () => `The action '${getState().action}' needs a '${config.actions[getState().action].args[getState().args.length]}'`,
         action: (answer) => handler.setParameterForAction(answer)
     },
     [7]: {
-        question: () => `Is '${state.args[state.args.length - 1]}' the '${config.actions[state.action].args[state.args.length - 1]}' (y/n)`,
+        question: () => `Is '${getState().args[getState().args.length - 1]}' the '${config.actions[getState().action].args[getState().args.length - 1]}' (y/n)`,
         action: (answer) => handler.confirmParameterForAction(answer)
     },
     [8]: {
-        question: () => `These are the new names after the replacement, do you want to continue? (y/n) ${handler.showListOfReplacedNames()}`,
+        question: () => `These are the new names after the replacement, do you want to continue? (y/n) ${handler.showListOfReplacedNames() || ''}`,
         action: (answer) => handler.confirmReplacedNames(answer)
     },
     [9]: {
-        question: () => `The --files and folders-- have been renamed`,
-        action: () => handler.showListOfResults()
-    },
-    [10]: {
         question: () => `
-            Type 'undo' to revert the filenames back to what they were
-            Type 'restart' to rename more files or folders
-            Type 'exit' to stop this application
+The ${getState().files && getState().folders ? 'files and folders' : getState().files ? 'files' : getState().folders ? 'folders' : null} have been successfully renamed!
+
+Type 'undo' to revert the filenames back to what they were
+Type 'restart' to rename more files or folders
+Type 'exit' to stop this application
         `,
         action: (answer) => handler.undoRestartOrExit(answer)
+    },
+    [11]: {
+        question: () => `Did you mean to type undo? (y/n)`,
+        action: (answer) => handler.confirmUndo(answer)
     },
     [999]: {
         question: () => ``,

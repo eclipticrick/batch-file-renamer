@@ -4,11 +4,21 @@ const initialState = {
     folders: null,
     action: null,
     args: [],
-    // backup: []
+    backup: {
+        files: [],
+        folders: []
+    }
 };
-let state = {
-    ...initialState
-};
-const clearState = () => state = { ...initialState };
+const copyInitialState = () => ({
+    ...initialState,
+    backup: {
+        ...initialState.backup
+    }
+});
 
-module.exports = { state, clearState };
+let state = copyInitialState();
+
+const clearState = () => state = copyInitialState();
+const getState = () => state;
+
+module.exports = { getState, clearState };
