@@ -6,6 +6,7 @@ const rl = readline.createInterface({
 });
 
 const utils = require('./utils');
+const state = require('./utils/state');
 
 console.info('Type ? to see a list of commands');
 const readLine = (step = 1) => {
@@ -17,7 +18,7 @@ const readLine = (step = 1) => {
             rl.close();
             process.exit();
         } else if (answer === 'cancel') {
-            utils.clearState();
+            state.clearState();
             readLine();
         } else if (answer === '?') {
             utils.logInfo();
