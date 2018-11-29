@@ -118,5 +118,23 @@ describe('is.js', () => {
             values.forEach(value => expect(() => fn(value, null)).toThrowError(errorMessage.stringOrNull()));
         });
     });
+    describe('is.booleanOrNull(value: any, path?: string): void', () => {
+        const fn = is.booleanOrNull;
+        it('should not throw an error when the first parameter is given and is a boolean or null', () => {
+            const values = [null, true, false];
+            values.forEach(value => expect(fn(value)).toBeUndefined());
+        });
+        it('should throw a TypeError with the correct message if the given value was not a boolean or null', () => {
+            const values = [0, 1234, '', 'abc', {}, [], { id: 0 }, [1, 2]];
+            values.forEach(value => expect(() => fn(value)).toThrow(TypeError));
+            values.forEach(value => expect(() => fn(value)).toThrowError(errorMessage.booleanOrNull()));
+            values.forEach(value => expect(() => fn(value, 'path')).toThrowError(errorMessage.booleanOrNull('path')));
+            values.forEach(value => expect(() => fn(value, '')).toThrowError(errorMessage.booleanOrNull()));
+            values.forEach(value => expect(() => fn(value, 0)).toThrowError(errorMessage.booleanOrNull()));
+            values.forEach(value => expect(() => fn(value, 1)).toThrowError(errorMessage.booleanOrNull('1')));
+            values.forEach(value => expect(() => fn(value, -1)).toThrowError(errorMessage.booleanOrNull('-1')));
+            values.forEach(value => expect(() => fn(value, null)).toThrowError(errorMessage.booleanOrNull()));
+        });
+    });
 
 });
