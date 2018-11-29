@@ -55,4 +55,34 @@ describe('helpers.js', () => {
             values.forEach(value => expect(() => fn(value)).toThrowError(errorMessage.string('input')));
         });
     });
+    describe('levenshteinDistance(source: string, target: string): number', () => {
+        const fn = helpers.levenshteinDistance;
+        it('should be a distance of 0', () => {
+            const source = ['a', 'abcde', 'hello', 'world', '1234', '1', '0', '111', ' ', '?/{}\\=-+<>,.!@#$%^&*()__-', '    ', '\n'];
+            const target = [...source];
+            source.forEach((x, i) => expect(fn(source[i], target[i])).toBe(0));
+        });
+        it('should be a distance of 1', () => {
+            expect(fn('', '@')).toBe(1);
+            expect(fn('a', '')).toBe(1);
+            expect(fn('a', 'A')).toBe(1);
+            expect(fn('a', 'b')).toBe(1);
+            expect(fn('a', 'aa')).toBe(1);
+            expect(fn('1', '-1')).toBe(1);
+            expect(fn('1', '1-')).toBe(1);
+            expect(fn('hello world', 'hallo world')).toBe(1);
+            expect(fn('hello world', 'HELLO warld'.toLowerCase())).toBe(1);
+        });
+        it('should be a distance of X', () => {
+            expect(fn('Hello World', 'HELLO WORLD!')).toBe(9);
+            expect(fn('Hello World!', 'HELLO WORLD')).toBe(9);
+            expect(fn('Hello World', 'HeLLO WoRLD')).toBe(6);
+
+            expect(fn('helld worlo', 'hello world')).toBe(2);
+            expect(fn('heldl worol', 'hello world')).toBe(4);
+            expect(fn('horld wello', 'hello world')).toBe(6);
+            expect(fn('world hello', 'hello world')).toBe(8);
+            expect(fn('lloel drhow', 'hello world')).toBe(9);
+        });
+    })
 });

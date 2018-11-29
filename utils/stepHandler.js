@@ -2,7 +2,7 @@
 const { log, info } = require('better-console');
 const helpers = require('./helpers');
 const config = require('../config');
-const { getState, clearState } = require('./state');
+const { getState, setState, clearState } = require('./state');
 const defaultFileSystem = require('./fileSystem');
 
 module.exports = {
@@ -15,14 +15,14 @@ module.exports = {
                 if (!fileSystem.pathIsAValidFolder(defaultPath)) {
                     return `The specified default path in 'config.js' is not valid (${defaultPath})`;
                 } else {
-                    getState().path = defaultPath;
+                    setState({ path: defaultPath })
                 }
             }
         } else {
             if (!fileSystem.pathIsAValidFolder(givenPath)) {
                 return `The given path is not valid ('${givenPath}')`;
             } else {
-                getState().path = givenPath;
+                setState({ path: givenPath });
             }
         }
         return null;
@@ -32,7 +32,7 @@ module.exports = {
         if (confirmation === true) {
             return null
         } else if (confirmation === false) {
-            getState().path = null;
+            setState({ path: null });
             return 1
         } else {
             return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
@@ -48,8 +48,10 @@ module.exports = {
         if (confirmation === true) {
             return null
         } else if (confirmation === false) {
-            getState().files = null;
-            getState().folders = null;
+            setState({
+                files: null,
+                folders: null
+            });
             return 3
         } else {
             return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
@@ -59,18 +61,24 @@ module.exports = {
         answer = answer.toLowerCase();
         if (!helpers.stringIsEmpty(answer)) {
             if (answer === 'files') {
-                getState().files = true;
+                setState({ files: true });
             } else if (answer === 'folders') {
-                getState().folders = true;
+                setState({ folders: true });
             } else if (answer === 'both') {
-                getState().files = true;
-                getState().folders = true;
+                setState({
+                    files: true,
+                    folders: true
+                });
             } else {
                 return `'${answer}' is not a valid answer, please answer with 'files', 'folders' or 'both'`
             }
         } else {
-            if (config.default.renameFiles) getState().files = true;
-            if (config.default.renameFolders) getState().folders = true;
+            if (config.default.renameFiles) {
+                setState({ files: true });
+            }
+            if (config.default.renameFolders) {
+                setState({ folders: true });
+            }
             if (!getState().files && !getState().folders) {
                 return `the default action is to rename 'nothing'... please type 'files', 'folders' or 'both' so this program has something to do`
             }
@@ -84,7 +92,7 @@ module.exports = {
         } else if (!possibleActions.includes(answer)) {
             return `'${answer}' is not a valid action (be aware, it's case sensitive)`
         } else {
-            getState().action = answer;
+            setState({ action: answer });
             if (!config.actions[answer].args) {
                 return 8
             } else {
@@ -97,7 +105,9 @@ module.exports = {
         }
     },
     setParameterForAction: (answer) => {
-        getState().args.push(answer);
+        const args = [...getState().args];
+        args.push(answer);
+        setState({ args });
         return null;
     },
     confirmParameterForAction: (answer) => {
@@ -135,13 +145,13 @@ module.exports = {
                 const oldFolderNames = fileSystem.getFolders(getState().path);
                 const newFolderNames = getState().backup.folders.forEach(f => config.actions[getState().action].fn(f)(...getState().args));
                 getState().backup.folders = [...oldFolderNames];
-                fileSystem.replaceFolders(oldFolderNames, newFolderNames);
+                fileSystem.replaceFolders(getState().path, oldFolderNames, newFolderNames);
             }
             if (getState().files) {
                 const oldFileNames = fileSystem.getFiles(getState().path);
                 const newFileNames = getState().backup.files.forEach(f => config.actions[getState().action].fn(f)(...getState().args));
                 getState().backup.files = [...oldFileNames];
-                fileSystem.replaceFiles(oldFileNames, newFileNames);
+                fileSystem.replaceFiles(getState().path, oldFileNames, newFileNames);
             }
             if(getState().folders) logList('renamed folders:', fileSystem.getFolders(getState().path));
             if(getState().files) logList('renamed files:', fileSystem.getFiles(getState().path));

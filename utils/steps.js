@@ -11,13 +11,10 @@ const steps = {
     },
     [2]: {
         question: () => `Is this path correct? (y/n) '${getState().path}'`,
-        action: (answer) => {
-            handler.confirmPath(answer);
-            handler.showListOfFilesAndFoldersBeforeReplacement();
-        }
+        action: (answer) => handler.confirmPath(answer)
     },
     [3]: {
-        question: () => `Do you want to rename files or folders or both? (default: ${renameFiles && renameFolders ? 'both' : renameFiles ? 'files' : renameFolders ? 'folders' : 'nothing'})`,
+        question: () => `Do you want to rename files or folders or both? (default: ${renameFiles && renameFolders ? 'both' : renameFiles ? 'files' : renameFolders ? 'folders' : 'nothing'} ${handler.showListOfFilesAndFoldersBeforeReplacement() || ''})`,
         action: (answer) => handler.setReplaceables(answer)
     },
     [4]: {
