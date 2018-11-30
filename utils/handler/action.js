@@ -1,62 +1,48 @@
-
 const { log, info } = require('better-console');
-const helpers = require('./helpers');
-const config = require('../config');
-const { getState, setState, clearState } = require('./state');
-const defaultFileSystem = require('./fileSystem');
+const helpers = require('../helpers');
+const config = require('../../config');
+const { getState, setState, clearState } = require('../state');
+const defaultFileSystem = require('../fileSystem');
 
-module.exports = {
+const handlers = {
+
+    // Step 1
     setPath: (givenPath, fileSystem = defaultFileSystem) => {
         if (helpers.stringIsEmpty(givenPath)) {
             const defaultPath = config.default.path;
             if (helpers.stringIsEmpty(defaultPath)) {
-                return `The specified default path in 'config.js' is empty`;
+                throw new Error(`The specified default path in 'config.js' is empty`);
             } else {
                 if (!fileSystem.pathIsAValidFolder(defaultPath)) {
-                    return `The specified default path in 'config.js' is not valid (${defaultPath})`;
+                    throw new Error(`The specified default path in 'config.js' is not valid (${defaultPath})`);
                 } else {
                     setState({ path: defaultPath })
                 }
             }
         } else {
             if (!fileSystem.pathIsAValidFolder(givenPath)) {
-                return `The given path is not valid ('${givenPath}')`;
+                throw new Error(`The given path is not valid ('${givenPath}')`);
             } else {
                 setState({ path: givenPath });
             }
         }
-        return null;
+        return 2;
     },
+
+    // Step 2
     confirmPath: (answer) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
-            return null
+            return 3
         } else if (confirmation === false) {
             setState({ path: null });
             return 1
         } else {
-            return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
+            throw new Error(`'${answer}' is not a valid answer, please answer with 'yes' or 'no'`)
         }
     },
-    showListOfFilesAndFoldersBeforeReplacement: (fileSystem = defaultFileSystem) => {
-        log('this path contains the following folders and files:');
-        fileSystem.getFolders(getState().path).forEach(folder => info(folder));
-        fileSystem.getFiles(getState().path).forEach(file => log(file));
-    },
-    confirmReplaceables: (answer) => {
-        const confirmation = helpers.confirm(answer);
-        if (confirmation === true) {
-            return null
-        } else if (confirmation === false) {
-            setState({
-                files: null,
-                folders: null
-            });
-            return 3
-        } else {
-            return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
-        }
-    },
+
+    // Step 3
     setReplaceables: (answer) => {
         answer = answer.toLowerCase();
         if (!helpers.stringIsEmpty(answer)) {
@@ -70,7 +56,7 @@ module.exports = {
                     folders: true
                 });
             } else {
-                return `'${answer}' is not a valid answer, please answer with 'files', 'folders' or 'both'`
+                throw new Error(`'${answer}' is not a valid answer, please answer with 'files', 'folders' or 'both'`)
             }
         } else {
             if (config.default.renameFiles) {
@@ -80,17 +66,35 @@ module.exports = {
                 setState({ folders: true });
             }
             if (!getState().files && !getState().folders) {
-                return `the default action is to rename 'nothing'... please type 'files', 'folders' or 'both' so this program has something to do`
+                throw new Error(`the default action is to rename 'nothing'... please type 'files', 'folders' or 'both' so this program has something to do`)
             }
         }
-        return null
+        return 4
     },
+
+    // Step 4
+    confirmReplaceables: (answer) => {
+        const confirmation = helpers.confirm(answer);
+        if (confirmation === true) {
+            return 5
+        } else if (confirmation === false) {
+            setState({
+                files: null,
+                folders: null
+            });
+            return 3
+        } else {
+            throw new Error(`'${answer}' is not a valid answer, please answer with 'yes' or 'no'`)
+        }
+    },
+
+    // Step 5
     setAction: (answer) => {
         const possibleActions = Object.keys(config.actions);
         if (helpers.stringIsEmpty(answer)) {
-            return `I'm sorry to tell you what to do.. but your action can't be nothing`
+            throw new Error(`I'm sorry to tell you what to do.. but your action can't be nothing`)
         } else if (!possibleActions.includes(answer)) {
-            return `'${answer}' is not a valid action (be aware, it's case sensitive)`
+            throw new Error(`'${answer}' is not a valid action (be aware, it's case sensitive)`)
         } else {
             setState({ action: answer });
             if (!config.actions[answer].args) {
@@ -99,17 +103,21 @@ module.exports = {
                 if (config.actions[answer].args.length === 0) {
                     return 8
                 } else {
-                    return null
+                    return 6
                 }
             }
         }
     },
+
+    // Step 6
     setParameterForAction: (answer) => {
         const args = [...getState().args];
         args.push(answer);
         setState({ args });
-        return null;
+        return 7;
     },
+
+    // Step 7
     confirmParameterForAction: (answer) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
@@ -118,26 +126,16 @@ module.exports = {
             if (amountOfNeededParams !== amountOfProvidedParams) {
                 return 6
             }
-            return null
+            return 8
         } else if (confirmation === false) {
             getState().args.pop();
             return 6
         } else {
-            return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
+            throw new Error(`'${answer}' is not a valid answer, please answer with 'yes' or 'no'`)
         }
     },
-    showListOfReplacedNames: (fileSystem = defaultFileSystem) => {
-        if(getState().folders) logList('folders', fileSystem.getFolders(getState().path));
-        if(getState().files) logList('files', fileSystem.getFiles(getState().path));
 
-        function logList(title, arr) {
-            log(`\n${title}:`);
-            log('[OLD]');
-            arr.forEach((f, i) => log(i === arr.length - 1 ? '└──' : '├──', f));
-            info('[NEW]');
-            arr.forEach((f, i) => info(i === arr.length - 1 ? '└──' : '├──', config.actions[getState().action].fn(f)(...getState().args)));
-        }
-    },
+    // Step 8
     confirmReplacedNames: (answer, fileSystem = defaultFileSystem) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
@@ -156,18 +154,20 @@ module.exports = {
             if(getState().folders) logList('renamed folders:', fileSystem.getFolders(getState().path));
             if(getState().files) logList('renamed files:', fileSystem.getFiles(getState().path));
 
-            return null
+            return 9
         } else if (confirmation === false) {
             return 5
         } else {
-            return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
+            throw new Error(`'${answer}' is not a valid answer, please answer with 'yes' or 'no'`)
         }
     },
+
+    // Step 9
     undoRestartOrExit: (answer) => {
         answer = answer.toLowerCase();
         const undoDis = helpers.levenshteinDistance(answer, 'undo');
         if (undoDis > 0 && undoDis < 3) {
-            return null
+            return 10
         } else if (answer === 'undo') {
             undo();
             return 1
@@ -177,9 +177,11 @@ module.exports = {
         } else if (answer === 'exit') {
             return 999
         } else {
-            return `'${answer}' is not a valid answer, please answer with 'undo', 'restart' or 'exit'`
+            throw new Error(`'${answer}' is not a valid answer, please answer with 'undo', 'restart' or 'exit'`)
         }
     },
+
+    // Step 10
     confirmUndo: (answer) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
@@ -188,19 +190,19 @@ module.exports = {
         } else if (confirmation === false) {
             return 9
         } else {
-            return `'${answer}' is not a valid answer, please answer with 'yes' or 'no'`
+            throw new Error(`'${answer}' is not a valid answer, please answer with 'yes' or 'no'`)
         }
     }
 };
 
 function undo(fileSystem = defaultFileSystem) {
     log('Reverting changes...');
-    if (getState().folders) {
-        fileSystem.replaceFolders(fileSystem.getFolders(getState().path), [...getState().backup.folders]);
-    }
-    if (getState().files) {
-        fileSystem.replaceFiles(fileSystem.getFiles(getState().path), [...getState().backup.files]);
-    }
+    // if (getState().folders) {
+    //     fileSystem.replaceFolders(fileSystem.getFolders(getState().path), [...getState().backup.folders]);
+    // }
+    // if (getState().files) {
+    //     fileSystem.replaceFiles(fileSystem.getFiles(getState().path), [...getState().backup.files]);
+    // }
 
     if(getState().folders) logList('folders', fileSystem.getFolders(getState().path));
     if(getState().files) logList('files', fileSystem.getFiles(getState().path));
@@ -212,3 +214,5 @@ function logList(title, arr) {
     log(`\n${title}`);
     arr.forEach((f, i) => log(i === arr.length - 1 ? '└──' : '├──', f));
 }
+
+module.exports = handlers;
