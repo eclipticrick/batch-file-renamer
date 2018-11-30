@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+  - 9
+  - 8
+  - 7
+  - 6
+  - node
+cache:
+  directories:
+    - node_modules
+jobs:
+  include:
+    - stage: Produce Coverage
+      node_js: node
+      script: npm run test:coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
