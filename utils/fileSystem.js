@@ -18,15 +18,15 @@ const hasPermissions = (dir) => {
 
         // The file or directory has stat & lstat permissions
         // (Information about the file or folder can be retrieved)
-        // fs.statSync(dir);
-        // fs.lstatSync(dir);
+        fs.statSync(dir);
+        fs.lstatSync(dir);
 
         // TODO: check if the file is in use / blocked
 
         return true
     }
     catch (err) {
-        console.log(dir, err.message)
+        console.log(dir, err)
         return false
     }
 };
