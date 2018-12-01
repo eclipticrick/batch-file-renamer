@@ -124,11 +124,13 @@ function createDummyFilesAndFolders() {
             folderNameArray.forEach(folderName => {
                 if (!fs.existsSync(path.join(dir, folderName))) {
                     fs.mkdirSync(path.join(dir, folderName));
+                    console.info('added folder:', dir, folderName)
                 }
             });
             fileNameArray.forEach(fileName => {
                 if (!fs.existsSync(path.join(dir, fileName))) {
-                    fs.writeFileSync(path.join(dir, fileName), fileName + 'content', {flag: 'wx'});
+                    fs.writeFileSync(path.join(dir, fileName), '', {flag: 'wx'});
+                    console.info('addedfile:', dir, fileName)
                 }
             });
         }
