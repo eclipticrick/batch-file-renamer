@@ -47,7 +47,6 @@ const pathIsAValidFolder = (dir) => {
 };
 const getFolders = (dir) => {
     return getFilesAndFolders(dir).filter(name => {
-        console.info('x', name)
         const fullPathToFileOrFolder = path.join(dir, name);
         if(hasPermissions(fullPathToFileOrFolder)) {
             return isDirectory(fullPathToFileOrFolder)
@@ -56,8 +55,8 @@ const getFolders = (dir) => {
     })
 };
 const getFiles = (dir) => {
-    if(!hasPermissions(dir)) return [];
     return getFilesAndFolders(dir).filter(name => {
+        console.info('x', name)
         const fullPathToFileOrFolder = path.join(dir, name);
         if(hasPermissions(fullPathToFileOrFolder)) {
             return isFile(fullPathToFileOrFolder)
