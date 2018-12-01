@@ -56,8 +56,8 @@ const getFolders = (dir) => {
 };
 const getFiles = (dir) => {
     return getFilesAndFolders(dir).filter(name => {
-        console.info('x', name)
         const fullPathToFileOrFolder = path.join(dir, name);
+        console.info('x', name, fullPathToFileOrFolder, hasPermissions(fullPathToFileOrFolder), isFile(fullPathToFileOrFolder))
         if(hasPermissions(fullPathToFileOrFolder)) {
             return isFile(fullPathToFileOrFolder)
         }
