@@ -26,6 +26,7 @@ const hasPermissions = (dir) => {
         return true
     }
     catch (err) {
+        console.log(dir, err.message)
         return false
     }
 };
@@ -57,7 +58,6 @@ const getFolders = (dir) => {
 const getFiles = (dir) => {
     return getFilesAndFolders(dir).filter(name => {
         const fullPathToFileOrFolder = path.join(dir, name);
-        console.info('x', name, fullPathToFileOrFolder, hasPermissions(fullPathToFileOrFolder), isFile(fullPathToFileOrFolder))
         if(hasPermissions(fullPathToFileOrFolder)) {
             return isFile(fullPathToFileOrFolder)
         }
