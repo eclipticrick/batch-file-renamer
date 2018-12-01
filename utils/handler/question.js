@@ -39,15 +39,14 @@ const handler = (currentStepNr, config = defaultConfig) => {
         case 4: return `So you want to rename ${stateRenameString()} in ${statePath()}? (y/n)`;
         case 5: return `To rename you have certain actions you can perform on the name, choose one.\nactions: '${Object.keys(config.actions).join(`', '`)}'`;
         case 6: return `The action '${stateAction()}' needs a '${getFirstParamNameWithoutValue(config)}'`;
-        case 7: return `Is '${getLastParamValue()}' the '${getLastParamNameWithValue(config)}' (y/n)`;
+        case 7: return `Is '${getLastParamValue()}' the '${getLastParamNameWithValue(config)}'? (y/n)`;
         case 8: return `These are the new names after the replacement, do you want to continue? (y/n)`;
         case 9: return `
 The ${stateRenameString2()} have been successfully renamed!
 
 Type 'undo' to revert the filenames back to what they were
 Type 'restart' to rename more files or folders
-Type 'exit' to stop this application
-        `;
+Type 'exit' to stop this application`;
         case 10: return `Did you mean to type undo? (y/n)`;
         default: return ''
     }
