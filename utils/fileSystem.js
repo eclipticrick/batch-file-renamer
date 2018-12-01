@@ -8,7 +8,7 @@ const hasPermissions = (dir) => {
         fs.accessSync(dir, fs.constants.F_OK);
 
         // The file or directory has execute permissions
-        fs.accessSync(dir, fs.constants.X_OK);
+        // fs.accessSync(dir, fs.constants.X_OK);
 
         // The file or directory has write permissions and is not in use at the moment
         fs.accessSync(dir, fs.constants.W_OK);
