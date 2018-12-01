@@ -26,7 +26,6 @@ const hasPermissions = (dir) => {
         return true
     }
     catch (err) {
-        console.log(dir, err)
         return false
     }
 };
