@@ -1,13 +1,13 @@
 const { log, info } = require('better-console');
 const helpers = require('../helpers');
-const config = require('../../config');
+const defaultConfig = require('../../config');
 const { getState, setState, clearState } = require('../state');
 const defaultFileSystem = require('../fileSystem');
 
 const handlers = {
 
     // Step 1
-    setPath: (givenPath, fileSystem = defaultFileSystem) => {
+    setPath: (givenPath, config = defaultConfig, fileSystem = defaultFileSystem) => {
         if (helpers.stringIsEmpty(givenPath)) {
             const defaultPath = config.default.path;
             if (helpers.stringIsEmpty(defaultPath)) {
@@ -43,7 +43,7 @@ const handlers = {
     },
 
     // Step 3
-    setReplaceables: (answer) => {
+    setReplaceables: (answer, config = defaultConfig) => {
         answer = answer.toLowerCase();
         if (!helpers.stringIsEmpty(answer)) {
             if (answer === 'files') {
@@ -59,13 +59,14 @@ const handlers = {
                 throw new Error(`'${answer}' is not a valid answer, please answer with 'files', 'folders' or 'both'`)
             }
         } else {
-            if (config.default.renameFiles) {
-                setState({ files: true });
-            }
-            if (config.default.renameFolders) {
-                setState({ folders: true });
-            }
-            if (!getState().files && !getState().folders) {
+            if (config.default.renameFiles || config.default.renameFolders) {
+                if (config.default.renameFiles) {
+                    setState({ files: true });
+                }
+                if (config.default.renameFolders) {
+                    setState({ folders: true });
+                }
+            } else {
                 throw new Error(`the default action is to rename 'nothing'... please type 'files', 'folders' or 'both' so this program has something to do`)
             }
         }
@@ -89,7 +90,7 @@ const handlers = {
     },
 
     // Step 5
-    setAction: (answer) => {
+    setAction: (answer, config = defaultConfig) => {
         const possibleActions = Object.keys(config.actions);
         if (helpers.stringIsEmpty(answer)) {
             throw new Error(`I'm sorry to tell you what to do.. but your action can't be nothing`)
@@ -118,7 +119,7 @@ const handlers = {
     },
 
     // Step 7
-    confirmParameterForAction: (answer) => {
+    confirmParameterForAction: (answer, config = defaultConfig) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
             const amountOfNeededParams = config.actions[getState().action].args.length;
@@ -136,7 +137,7 @@ const handlers = {
     },
 
     // Step 8
-    confirmReplacedNames: (answer, fileSystem = defaultFileSystem) => {
+    confirmReplacedNames: (answer, config = defaultConfig, fileSystem = defaultFileSystem) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
             if (getState().folders) {
@@ -196,6 +197,9 @@ const handlers = {
 };
 
 function undo(fileSystem = defaultFileSystem) {
+
+    // TODO
+
     log('Reverting changes...');
     // if (getState().folders) {
     //     fileSystem.replaceFolders(fileSystem.getFolders(getState().path), [...getState().backup.folders]);
