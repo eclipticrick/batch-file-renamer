@@ -7,6 +7,7 @@ const testingFileNames =   ['test aaaaaa.txt', 'test bbbbbb.txt', 'test cccccc.t
 const beforeQuestionHandler = require('./before');
 
 global.console = {
+    error: jest.fn(),
     warn: jest.fn(),
     info: jest.fn(),
     log: jest.fn()
@@ -18,6 +19,14 @@ const fileSystemMock = {
 const fileSystemMockEmpty = {
     getFolders: () => [],
     getFiles: () => []
+};
+const configMock = {
+    actions: {
+        toUpperCase: {
+            fn: (oldName) => () => oldName.toUpperCase(),
+            args: []
+        }
+    }
 };
 const shouldLogIfEmpty = (title) => `\nThere are no ${title} in this directory (type 'cancel' to go back to the beginning)!`;
 
@@ -57,7 +66,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMock);
+            fn(console, fileSystemMock, configMock);
 
             shouldLogListToUppercase('folders', fileSystemMock.getFolders());
         });
@@ -69,7 +78,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMock);
+            fn(console, fileSystemMock, configMock);
 
             shouldLogListToUppercase('files', fileSystemMock.getFiles());
 
@@ -82,7 +91,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMock);
+            fn(console, fileSystemMock, configMock);
 
             shouldLogListToUppercase('folders', fileSystemMock.getFolders());
             shouldLogListToUppercase('files', fileSystemMock.getFiles());
@@ -95,7 +104,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMockEmpty);
+            fn(console, fileSystemMockEmpty, configMock);
 
             expect(fileSystemMockEmpty.getFolders()).toEqual([]);
             expect(global.console.log).toHaveBeenCalledWith(shouldLogIfEmpty('folders'));
@@ -109,7 +118,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMockEmpty);
+            fn(console, fileSystemMockEmpty, configMock);
 
             expect(fileSystemMockEmpty.getFiles()).toEqual([]);
             expect(global.console.log).toHaveBeenCalledWith(shouldLogIfEmpty('files'));
@@ -122,7 +131,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMockEmpty);
+            fn(console, fileSystemMockEmpty, configMock);
 
             expect(fileSystemMockEmpty.getFolders()).toEqual([]);
             expect(fileSystemMockEmpty.getFiles()).toEqual([]);

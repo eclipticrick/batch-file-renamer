@@ -1,6 +1,13 @@
 const actionHandler = require('./action');
 const { getState, setState, clearState } = require('../state');
 
+global.console = {
+    error: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn(),
+    log: jest.fn()
+};
+
 describe('action.js', () => {
     describe('step 1 - setPath(givenPath: string, config?: dependency, fileSystem?: dependency): number', () => {
         const fn = actionHandler.setPath;
@@ -89,7 +96,19 @@ describe('action.js', () => {
             };
             expect(fn(answer, customConfig)).toBe(4);
             expect(getState().folders).toBe(true);
-            expect(getState().files).toBeFalsy()
+            expect(getState().files).toBeFalsy();
+
+            clearState();
+            customConfig.default.renameFiles = true;
+            expect(fn(answer, customConfig)).toBe(4);
+            expect(getState().folders).toBe(true);
+            expect(getState().files).toBe(true);
+
+            clearState();
+            customConfig.default.renameFolders = false;
+            expect(fn(answer, customConfig)).toBe(4);
+            expect(getState().folders).toBeFalsy();
+            expect(getState().files).toBe(true);
         });
         it(`should throw an error when the answer was invalid'`, () => {
             const answer = 'asdasdsadasdas';

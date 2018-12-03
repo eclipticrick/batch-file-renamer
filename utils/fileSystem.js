@@ -64,11 +64,52 @@ const getFiles = (dir) => {
     })
 };
 const replaceFolders = (dir, oldNames, newNames) => {
-    // if (oldNames.length !== newNames.length)
-    // TODO: replace
+    if (oldNames.length !== newNames.length) {
+        throw new Error('Old folderNames array and new folderNames array are not equal in size!')
+    }
+    const resultingNames = [];
+    oldNames.forEach((oldName, i) => {
+        try {
+            let error;
+            fs.renameSync(
+                path.join(dir, oldName),
+                path.join(dir, newNames[i]),
+                err => err ? error = true : error = false
+            );
+            if (!error) {
+                resultingNames.push(newNames[i])
+            } else {
+                resultingNames.push(null)
+            }
+        } catch (e) {
+            resultingNames.push(null)
+        }
+    });
+    return resultingNames
 };
 const replaceFiles = (dir, oldNames, newNames) => {
-    // TODO: replace
+    if (oldNames.length !== newNames.length) {
+        throw new Error('Old fileNames array and new fileNames array are not equal in size!')
+    }
+    const resultingNames = [];
+    oldNames.forEach((oldName, i) => {
+        try {
+            let error;
+            fs.renameSync(
+                path.join(dir, oldName),
+                path.join(dir, newNames[i]),
+                err => err ? error = true : error = false
+            );
+            if (!error) {
+                resultingNames.push(newNames[i])
+            } else {
+                resultingNames.push(null)
+            }
+        } catch (e) {
+            resultingNames.push(null)
+        }
+    });
+    return resultingNames
 };
 
 module.exports = { hasPermissions, pathIsAValidFolder, getFiles, getFolders, replaceFolders, replaceFiles };

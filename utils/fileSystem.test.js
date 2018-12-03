@@ -68,21 +68,54 @@ Failed to delete & recreate the dummy files and folders in ${testingPath}
         });
         describe('replaceFolders()', () => {
             const fn = fileSystem.replaceFolders;
+            const newFolderNames = ['x world aaa', 'x world bbb', 'x world ccc', 'x world ddd', 'x world eee'];
 
-            it.skip('should', () => {
-                // TODO
-            })
+            it('should replace all sub folders in a folder', () => {
+                expect(fn(testingPath, testingFolderNames, newFolderNames)).toEqual(newFolderNames);
+                if (!resetDummyFilesAndFolders()) {
+                    fail('Resetting dummy files has failed!');
+                }
+            });
+            it('should replace all but one of the sub folders in a folder', () => {
+                const oldFolderNames = [...testingFolderNames];
+                oldFolderNames[0] = 'a non existing folder name';
+                const expectedNewNames = [...newFolderNames];
+                expectedNewNames[0] = null;
+                expect(fn(testingPath, oldFolderNames, newFolderNames)).toEqual(expectedNewNames);
+
+                if (!resetDummyFilesAndFolders()) {
+                    fail('Resetting dummy files has failed!');
+                }
+            });
         });
         describe('replaceFiles()', () => {
             const fn = fileSystem.replaceFiles;
+            const newFileNames = ['x aaaaaa.txt', 'x bbbbbb.txt', 'x cccccc.txt', 'x dddddd.txt', 'x eeeeee.txt'];
 
-            it.skip('should', () => {
-                // TODO
-            })
+            it('should replace all files in a folder', () => {
+                expect(fn(testingPath, testingFileNames, newFileNames)).toEqual(newFileNames);
+
+                if (!resetDummyFilesAndFolders()) {
+                    fail('Resetting dummy files has failed!');
+                }
+            });
+            it('should replace all but one of the files in a folder', () => {
+                const oldFileNames = [...testingFileNames];
+                oldFileNames[0] = 'a non existing file name.txt';
+                const expectedNewNames = [...newFileNames];
+                expectedNewNames[0] = null;
+                expect(fn(testingPath, oldFileNames, newFileNames)).toEqual(expectedNewNames);
+
+                if (!resetDummyFilesAndFolders()) {
+                    fail('Resetting dummy files has failed!');
+                }
+            });
         })
     }
 });
-
+function resetDummyFilesAndFolders() {
+    return createDummyFilesAndFolders()
+}
 function createDummyFilesAndFolders() {
     try {
         const fs = require('fs');
@@ -124,13 +157,11 @@ function createDummyFilesAndFolders() {
             folderNameArray.forEach(folderName => {
                 if (!fs.existsSync(path.join(dir, folderName))) {
                     fs.mkdirSync(path.join(dir, folderName));
-                    console.info('added folder:', dir, folderName)
                 }
             });
             fileNameArray.forEach(fileName => {
                 if (!fs.existsSync(path.join(dir, fileName))) {
                     fs.writeFileSync(path.join(dir, fileName), '', {flag: 'wx'});
-                    console.info('addedfile:', dir, fileName)
                 }
             });
         }

@@ -1,4 +1,4 @@
-const { log, info } = require('better-console');
+const betterConsole = require('better-console');
 const helpers = require('../helpers');
 const defaultConfig = require('../../config');
 const { getState, setState, clearState } = require('../state');
@@ -142,19 +142,22 @@ const handlers = {
         if (confirmation === true) {
             if (getState().folders) {
                 const oldFolderNames = fileSystem.getFolders(getState().path);
-                const newFolderNames = getState().backup.folders.forEach(f => config.actions[getState().action].fn(f)(...getState().args));
+
+                const newFolderNames = oldFolderNames.map(f => config.actions[getState().action].fn(f)(...getState().args));
+
                 getState().backup.folders = [...oldFolderNames];
-                fileSystem.replaceFolders(getState().path, oldFolderNames, newFolderNames);
+                const renamedFolders = fileSystem.replaceFolders(getState().path, oldFolderNames, newFolderNames);
+                logList('renamed folders:', renamedFolders, console)
             }
             if (getState().files) {
                 const oldFileNames = fileSystem.getFiles(getState().path);
-                const newFileNames = getState().backup.files.forEach(f => config.actions[getState().action].fn(f)(...getState().args));
-                getState().backup.files = [...oldFileNames];
-                fileSystem.replaceFiles(getState().path, oldFileNames, newFileNames);
-            }
-            if(getState().folders) logList('renamed folders:', fileSystem.getFolders(getState().path));
-            if(getState().files) logList('renamed files:', fileSystem.getFiles(getState().path));
 
+                const newFileNames = oldFileNames.map(f => config.actions[getState().action].fn(f)(...getState().args));
+
+                getState().backup.files = [...oldFileNames];
+                const renamedFiles = fileSystem.replaceFiles(getState().path, oldFileNames, newFileNames);
+                logList('renamed files:', renamedFiles, console)
+            }
             return 9
         } else if (confirmation === false) {
             return 5
@@ -164,13 +167,13 @@ const handlers = {
     },
 
     // Step 9
-    undoRestartOrExit: (answer) => {
+    undoRestartOrExit: (answer, console = betterConsole, fileSystem = defaultFileSystem) => {
         answer = answer.toLowerCase();
         const undoDis = helpers.levenshteinDistance(answer, 'undo');
         if (undoDis > 0 && undoDis < 3) {
             return 10
         } else if (answer === 'undo') {
-            undo();
+            undo(console, fileSystem);
             return 1
         } else if (answer === 'restart') {
             clearState();
@@ -183,10 +186,10 @@ const handlers = {
     },
 
     // Step 10
-    confirmUndo: (answer) => {
+    confirmUndo: (answer, console = betterConsole, fileSystem = defaultFileSystem) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
-            undo();
+            undo(console, fileSystem);
             return 1
         } else if (confirmation === false) {
             return 9
@@ -196,27 +199,26 @@ const handlers = {
     }
 };
 
-function undo(fileSystem = defaultFileSystem) {
-
-    // TODO
-
-    log('Reverting changes...');
-    // if (getState().folders) {
-    //     fileSystem.replaceFolders(fileSystem.getFolders(getState().path), [...getState().backup.folders]);
-    // }
-    // if (getState().files) {
-    //     fileSystem.replaceFiles(fileSystem.getFiles(getState().path), [...getState().backup.files]);
-    // }
-
-    if(getState().folders) logList('folders', fileSystem.getFolders(getState().path));
-    if(getState().files) logList('files', fileSystem.getFiles(getState().path));
-
-    info('The changes have been reverted!');
+function undo(console, fileSystem) {
+    console.info('Reverting changes...');
+    if (getState().folders) {
+        const oldFolderNames = fileSystem.getFolders(getState().path);
+        const newFolderNames = getState().backup.folders;
+        const renamedFolders = fileSystem.replaceFolders(getState().path, oldFolderNames, newFolderNames);
+        logList('Folders:', renamedFolders, console);
+    }
+    if (getState().files) {
+        const oldFileNames = fileSystem.getFiles(getState().path);
+        const newFileNames = getState().backup.files;
+        const renamedFiles = fileSystem.replaceFiles(getState().path, oldFileNames, newFileNames);
+        logList('Files:', renamedFiles, console)
+    }
+    console.info('The changes have been reverted!');
 }
 
-function logList(title, arr) {
-    log(`\n${title}`);
-    arr.forEach((f, i) => log(i === arr.length - 1 ? '└──' : '├──', f));
+function logList(title, arr, console) {
+    console.log(`\n${title}`);
+    arr.forEach((f, i) => console.log(i === arr.length - 1 ? '└──' : '├──', f));
 }
 
 module.exports = handlers;
