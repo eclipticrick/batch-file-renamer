@@ -8,6 +8,9 @@ global.console = {
     log: jest.fn()
 };
 
+const yesAnswers = ['', 'y', 'yes', 'Y', 'YES', 'YeS'];
+const noAnswers = ['n', 'no', 'N', 'NO'];
+
 describe('action.js', () => {
     describe('step 1 - setPath(givenPath: string, config?: dependency, fileSystem?: dependency): number', () => {
         const fn = actionHandler.setPath;
@@ -198,8 +201,6 @@ describe('action.js', () => {
                 }
             }
         };
-        const yesAnswers = ['', 'y', 'yes', 'Y', 'YES', 'YeS'];
-        const noAnswers = ['n', 'no', 'N', 'NO'];
 
         it('should return stepNr 6 if the user confirmed the param value and the action requires another param', () => {
             clearState();
@@ -237,17 +238,119 @@ describe('action.js', () => {
     });
     describe('step 8 - confirmReplacedNames(answer: string, config?: dependency, fileSystem?: dependency): number', () => {
         const fn = actionHandler.confirmReplacedNames;
-        // TODO: after backup is refactored
+        const config = {
+            actions: {
+                replace: {
+                    fn: (oldName) => (replaceString, withString) => {
+                        const re = new RegExp(replaceString, 'g');
+                        return oldName.replace(re, withString);
+                    },
+                    args: ['string to replace', 'replacement string']
+                }
+            }
+        };
+        const fileSystem = {
+            getFolders: () => ['aaa', 'bbb'],
+            replaceFolders: () => ['ccc', 'bbb'],
+            getFiles: () => ['aaa.txt', 'bbb.txt'],
+            replaceFiles: () => ['ccc.txt', 'bbb.txt']
+        };
+
+        it('should return stepNr 9 and rename folders if the user confirmed', () => {
+            yesAnswers.forEach(answer => {
+                clearState();
+                setState({
+                    folders: true,
+                    path: 'somewhere',
+                    args: ['aaa', 'ccc'],
+                    action: 'replace'
+                });
+                expect(fn(answer, config, fileSystem)).toBe(9)
+            })
+        });
+        it('should return stepNr 9 and rename files if the user confirmed', () => {
+            yesAnswers.forEach(answer => {
+                clearState();
+                setState({
+                    files: true,
+                    path: 'somewhere',
+                    args: ['aaa', 'ccc'],
+                    action: 'replace'
+                });
+                expect(fn(answer, config, fileSystem)).toBe(9)
+            })
+        });
+        it('should return stepNr 9 and rename both files and if the user confirmed', () => {
+            yesAnswers.forEach(answer => {
+                clearState();
+                setState({
+                    folders: true,
+                    files: true,
+                    path: 'somewhere',
+                    args: ['aaa', 'ccc'],
+                    action: 'replace'
+                });
+                expect(fn(answer, config, fileSystem)).toBe(9)
+            })
+        });
+        it('should return stepNr 5 and rename both files and if the user rejects', () => {
+            noAnswers.forEach(answer => {
+                expect(fn(answer, config, fileSystem)).toBe(5)
+            })
+        });
+        it('should throw an error if the user doesnt answer with yes or no', () => {
+            const answer = 'dsadsad';
+            expect(() => fn(answer, config, fileSystem)).toThrowError(`'${answer}' is not a valid answer, please answer with 'yes' or 'no'`)
+        });
 
     });
     describe('step 9 - undoRestartOrExit(answer: string): number', () => {
         const fn = actionHandler.undoRestartOrExit;
-
+        const fileSystem = {
+            getFolders: () => [],
+            replaceFolders: () => [],
+            getFiles: () => [],
+            replaceFiles: () => []
+        };
+        it('should return stepNr 1 to restart the program & and undo the renaming', () => {
+            clearState();
+            setState({
+                files: true,
+                folders: true,
+                backup: {
+                    files: [],
+                    folders: [],
+                }
+            });
+            const answer = 'undo';
+            expect(fn(answer, console, fileSystem)).toBe(1);
+        });
+        it('should return stepNr 10 and ask the user if he meant to type undo', () => {
+            const almostUndoAnswers = ['und', 'undoo', 'unso', 'mndo'];
+            almostUndoAnswers.forEach(answer => {
+                expect(fn(answer, console, fileSystem)).toBe(10);
+            })
+        });
+        it('should return stepNr 1 to restart the program & and clear the state', () => {
+            clearState();
+            setState({ path: 'something' });
+            const answer = 'restart';
+            expect(fn(answer, console, fileSystem)).toBe(1);
+            expect(getState().path).toBeNull()
+        });
+        it('should return stepNr 999 to exit the program', () => {
+            const answer = 'exit';
+            expect(fn(answer, console, fileSystem)).toBe(999);
+        });
+        it('should throw an error telling the user that the given answer was invalid', () => {
+            const answer = 'sdasfsdsa';
+            expect(() => fn(answer, console, fileSystem))
+                .toThrowError(`'${answer}' is not a valid answer, please answer with 'undo', 'restart' or 'exit'`);
+        })
     });
     describe('step 10 - confirmUndo(answer: string): number', () => {
         const fn = actionHandler.confirmUndo;
         runConfirmationTests(fn, 1, 9);
-        // todo: expect UNDO to be successful
     });
 });
 

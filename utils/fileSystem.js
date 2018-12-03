@@ -70,19 +70,13 @@ const replaceFolders = (dir, oldNames, newNames) => {
     const resultingNames = [];
     oldNames.forEach((oldName, i) => {
         try {
-            let error;
             fs.renameSync(
                 path.join(dir, oldName),
-                path.join(dir, newNames[i]),
-                err => err ? error = true : error = false
+                path.join(dir, newNames[i])
             );
-            if (!error) {
-                resultingNames.push(newNames[i])
-            } else {
-                resultingNames.push(null)
-            }
+            resultingNames.push(newNames[i]);
         } catch (e) {
-            resultingNames.push(null)
+            resultingNames.push(null);
         }
     });
     return resultingNames
@@ -94,19 +88,13 @@ const replaceFiles = (dir, oldNames, newNames) => {
     const resultingNames = [];
     oldNames.forEach((oldName, i) => {
         try {
-            let error;
             fs.renameSync(
                 path.join(dir, oldName),
-                path.join(dir, newNames[i]),
-                err => err ? error = true : error = false
+                path.join(dir, newNames[i])
             );
-            if (!error) {
-                resultingNames.push(newNames[i])
-            } else {
-                resultingNames.push(null)
-            }
+            resultingNames.push(newNames[i]);
         } catch (e) {
-            resultingNames.push(null)
+            resultingNames.push(null);
         }
     });
     return resultingNames

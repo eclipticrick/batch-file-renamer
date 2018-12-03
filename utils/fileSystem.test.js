@@ -70,6 +70,10 @@ Failed to delete & recreate the dummy files and folders in ${testingPath}
             const fn = fileSystem.replaceFolders;
             const newFolderNames = ['x world aaa', 'x world bbb', 'x world ccc', 'x world ddd', 'x world eee'];
 
+            it('should throw an error if the oldNames and newNames list are not equal in size', () => {
+                expect(() => fn(testingPath, ['abc'], []))
+                    .toThrowError('Old folderNames array and new folderNames array are not equal in size!')
+            });
             it('should replace all sub folders in a folder', () => {
                 expect(fn(testingPath, testingFolderNames, newFolderNames)).toEqual(newFolderNames);
                 if (!resetDummyFilesAndFolders()) {
@@ -92,6 +96,10 @@ Failed to delete & recreate the dummy files and folders in ${testingPath}
             const fn = fileSystem.replaceFiles;
             const newFileNames = ['x aaaaaa.txt', 'x bbbbbb.txt', 'x cccccc.txt', 'x dddddd.txt', 'x eeeeee.txt'];
 
+            it('should throw an error if the oldNames and newNames list are not equal in size', () => {
+                expect(() => fn(testingPath, ['abc.txt'], []))
+                    .toThrowError('Old fileNames array and new fileNames array are not equal in size!')
+            });
             it('should replace all files in a folder', () => {
                 expect(fn(testingPath, testingFileNames, newFileNames)).toEqual(newFileNames);
 
