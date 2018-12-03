@@ -20,9 +20,6 @@ describe('action.js', () => {
             }
         };
         const fileSystem = {};
-        it('should be able to call the function without injecting dependencies', () => {
-            expect(() => fn('./utils')).not.toThrowError()
-        });
         it('should set the path if the given path is not empty and is a valid folder', () => {
             const givenPath = 'test';
             fileSystem.pathIsAValidFolder = () => true;
@@ -350,7 +347,38 @@ describe('action.js', () => {
     });
     describe('step 10 - confirmUndo(answer: string): number', () => {
         const fn = actionHandler.confirmUndo;
-        runConfirmationTests(fn, 1, 9);
+        const fileSystem = {
+            getFolders: () => [],
+            replaceFolders: () => [],
+            getFiles: () => [],
+            replaceFiles: () => []
+        };
+        it('should return stepNr 3', () => {
+            const yesAnswers = ['y', 'yes', ''];
+            yesAnswers.forEach(answer => {
+                expect(fn(answer, console, fileSystem)).toBe(1)
+            });
+        });
+        it('should return stepNr 1 ans should set state.path to null', () => {
+            const noAnswers = ['n', 'no'];
+            clearState();
+            setState({
+                path: 'something'
+            });
+            noAnswers.forEach(answer => {
+                expect(fn(answer, console, fileSystem)).toBe(9)
+            });
+        });
+        it('should throw an error if the answer is not yes/y/no/n or nothing', () => {
+            const otherAnswers = [' ', 'x', 'nee', 'ja', 'j', 'something', 'test'];
+            clearState();
+            setState({
+                path: 'something'
+            });
+            otherAnswers.forEach(answer => {
+                expect(() => fn(answer, console, fileSystem)).toThrowError(`'${answer}' is not a valid answer, please answer with 'yes' or 'no'`)
+            });
+        });
     });
 });
 

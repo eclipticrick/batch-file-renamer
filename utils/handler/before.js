@@ -1,19 +1,16 @@
-const betterConsole = require('better-console');
-const defaultConfig = require('../../config');
 const { getState } = require('../state');
-const defaultFileSystem = require('../fileSystem');
 
 const handlers = {
 
     // Before step 3
-    showListOfFilesAndFoldersBeforeReplacement: (console = betterConsole, fileSystem = defaultFileSystem) => {
+    showListOfFilesAndFoldersBeforeReplacement: (console, fileSystem) => {
         console.log('this path contains the following folders and files:');
         fileSystem.getFolders(getState().path).forEach(folder => console.info(folder));
         fileSystem.getFiles(getState().path).forEach(file => console.log(file));
     },
 
     // Before step 8
-    showListOfReplacedNames: (console = betterConsole, fileSystem = defaultFileSystem, config = defaultConfig) => {
+    showListOfReplacedNames: (config, console, fileSystem) => {
         if(getState().folders) logList('folders', fileSystem.getFolders(getState().path));
         if(getState().files) logList('files', fileSystem.getFiles(getState().path));
 

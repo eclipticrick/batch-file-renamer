@@ -1,4 +1,3 @@
-const defaultConfig = require('../../config');
 const { getState } = require('../state');
 
 const renameString = (folders, files, phrasings = ['both', 'files', 'folders', 'nothing']) =>
@@ -31,7 +30,7 @@ const statePath = () => getState().path;
 const stateAction = () => getState().action;
 
 
-const handler = (currentStepNr, config = defaultConfig) => {
+const handler = (currentStepNr, config) => {
     switch (currentStepNr) {
         case 1: return `Specify a folder where you want to rename files (default: '${defaultPath(config)}')`;
         case 2: return `Is this path correct? (y/n) '${statePath()}'`;

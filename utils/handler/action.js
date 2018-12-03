@@ -1,13 +1,10 @@
-const betterConsole = require('better-console');
 const helpers = require('../helpers');
-const defaultConfig = require('../../config');
 const { getState, setState, clearState } = require('../state');
-const defaultFileSystem = require('../fileSystem');
 
 const handlers = {
 
     // Step 1
-    setPath: (givenPath, config = defaultConfig, fileSystem = defaultFileSystem) => {
+    setPath: (givenPath, config, fileSystem) => {
         if (helpers.stringIsEmpty(givenPath)) {
             const defaultPath = config.default.path;
             if (helpers.stringIsEmpty(defaultPath)) {
@@ -43,7 +40,7 @@ const handlers = {
     },
 
     // Step 3
-    setReplaceables: (answer, config = defaultConfig) => {
+    setReplaceables: (answer, config) => {
         answer = answer.toLowerCase();
         if (!helpers.stringIsEmpty(answer)) {
             if (answer === 'files') {
@@ -90,7 +87,7 @@ const handlers = {
     },
 
     // Step 5
-    setAction: (answer, config = defaultConfig) => {
+    setAction: (answer, config) => {
         const possibleActions = Object.keys(config.actions);
         if (helpers.stringIsEmpty(answer)) {
             throw new Error(`I'm sorry to tell you what to do.. but your action can't be nothing`)
@@ -119,7 +116,7 @@ const handlers = {
     },
 
     // Step 7
-    confirmParameterForAction: (answer, config = defaultConfig) => {
+    confirmParameterForAction: (answer, config) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
             const amountOfNeededParams = config.actions[getState().action].args.length;
@@ -137,7 +134,7 @@ const handlers = {
     },
 
     // Step 8
-    confirmReplacedNames: (answer, config = defaultConfig, fileSystem = defaultFileSystem) => {
+    confirmReplacedNames: (answer, config, fileSystem) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
             if (getState().folders) {
@@ -167,7 +164,7 @@ const handlers = {
     },
 
     // Step 9
-    undoRestartOrExit: (answer, console = betterConsole, fileSystem = defaultFileSystem) => {
+    undoRestartOrExit: (answer, console, fileSystem) => {
         answer = answer.toLowerCase();
         const undoDis = helpers.levenshteinDistance(answer, 'undo');
         if (undoDis > 0 && undoDis < 3) {
@@ -186,7 +183,7 @@ const handlers = {
     },
 
     // Step 10
-    confirmUndo: (answer, console = betterConsole, fileSystem = defaultFileSystem) => {
+    confirmUndo: (answer, console, fileSystem) => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
             undo(console, fileSystem);

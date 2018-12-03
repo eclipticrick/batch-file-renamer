@@ -1,8 +1,6 @@
 const { setState } = require('../state');
-
 const testingFolderNames = ['hello world aaa', 'hello world bbb', 'hello world ccc', 'hello world ddd', 'hello world eee'];
 const testingFileNames =   ['test aaaaaa.txt', 'test bbbbbb.txt', 'test cccccc.txt', 'test dddddd.txt', 'test eeeeee.txt'];
-
 
 const beforeQuestionHandler = require('./before');
 
@@ -33,9 +31,6 @@ const shouldLogIfEmpty = (title) => `\nThere are no ${title} in this directory (
 describe('before.js', () => {
     describe('showListOfFilesAndFoldersBeforeReplacement()', () => {
         const fn = beforeQuestionHandler.showListOfFilesAndFoldersBeforeReplacement;
-        it('should run without params and not throw an error', () => {
-            expect(() => fn()).not.toThrowError()
-        });
         it('should log the files and folders', () => {
             setState({ path: 'Some dir' });
 
@@ -66,7 +61,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMock, configMock);
+            fn(configMock, console, fileSystemMock);
 
             shouldLogListToUppercase('folders', fileSystemMock.getFolders());
         });
@@ -78,7 +73,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMock, configMock);
+            fn(configMock, console, fileSystemMock);
 
             shouldLogListToUppercase('files', fileSystemMock.getFiles());
 
@@ -91,7 +86,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMock, configMock);
+            fn(configMock, console, fileSystemMock);
 
             shouldLogListToUppercase('folders', fileSystemMock.getFolders());
             shouldLogListToUppercase('files', fileSystemMock.getFiles());
@@ -104,7 +99,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMockEmpty, configMock);
+            fn(configMock, console, fileSystemMockEmpty);
 
             expect(fileSystemMockEmpty.getFolders()).toEqual([]);
             expect(global.console.log).toHaveBeenCalledWith(shouldLogIfEmpty('folders'));
@@ -118,7 +113,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMockEmpty, configMock);
+            fn(configMock, console, fileSystemMockEmpty);
 
             expect(fileSystemMockEmpty.getFiles()).toEqual([]);
             expect(global.console.log).toHaveBeenCalledWith(shouldLogIfEmpty('files'));
@@ -131,7 +126,7 @@ describe('before.js', () => {
                 action: 'toUpperCase'
             });
 
-            fn(console, fileSystemMockEmpty, configMock);
+            fn(configMock, console, fileSystemMockEmpty);
 
             expect(fileSystemMockEmpty.getFolders()).toEqual([]);
             expect(fileSystemMockEmpty.getFiles()).toEqual([]);

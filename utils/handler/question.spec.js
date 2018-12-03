@@ -1,14 +1,33 @@
 const questionHandler = require('./question');
-const config = require('../../config');
 const { setState, clearState } = require('../state');
 const testPath = 'Z:/test/test/test';
+const config = {
+    default: {
+        path: 'D:\\Projects\\npm\\batch-renamer\\tmp',
+        renameFolders: false,
+        renameFiles: false
+    },
+    actions: {
+        replace: {
+            fn: (oldName) => (replaceString, withString) => {
+                const re = new RegExp(replaceString, 'g');
+                return oldName.replace(re, withString);
+            },
+            args: ['string to replace', 'replacement string']
+        },
+        reverse: {
+            fn: (oldName) => () => oldName.split('').reverse().join(''),
+            args: []
+        }
+    }
+};
 
 describe('question.js', () => {
     const fn = questionHandler;
     describe('handler(stepNr: number): string', () => {
         describe('question 1', () => {
             it('should ask the user to specify a folder', () => {
-                expect(fn(1)).toBe(`Specify a folder where you want to rename files (default: '${config.default.path}')`)
+                expect(fn(1, config)).toBe(`Specify a folder where you want to rename files (default: '${config.default.path}')`)
             });
         });
         describe('question 2', () => {
