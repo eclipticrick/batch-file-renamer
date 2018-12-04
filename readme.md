@@ -67,7 +67,7 @@ module.exports = {
 
 Run the program to rename files & folders
 
-![](https://media.giphy.com/media/RMxzoQAi3QIpwUZ50T/giphy.gif)
+![Example](https://media.giphy.com/media/RMxzoQAi3QIpwUZ50T/giphy.gif)
 
 ## Authors
 
