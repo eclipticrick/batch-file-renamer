@@ -39,7 +39,7 @@ npm run start
 
 ## Usage
 
-(Optionally) Configure the defaults ```config.js```
+(Optionally) Configure the defaults or add custom actions in ```config.js```
 
 ```javascript
 module.exports = {
@@ -49,6 +49,13 @@ module.exports = {
         renameFiles: true
     },
     actions: {
+        replace: {
+            fn: oldName => (replaceString, withString) => {
+                const re = new RegExp(replaceString, 'g');
+                return oldName.replace(re, withString);
+            },
+            args: ['string to replace', 'replacement string']
+        },
         reverse: {
             fn: oldName => () => oldName.split('').reverse().join(''),
             args: []
