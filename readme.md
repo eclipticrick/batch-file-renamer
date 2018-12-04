@@ -2,9 +2,9 @@
 
 For renaming multiple files and/or sub-folders at once in a folder
 
-[![Build Status](https://travis-ci.com/eclipticrick/batch-file-renamer.svg?branch=master)](https://travis-ci.com/eclipticrick/Ecliptic-OS)
-[![Coverage Status](https://coveralls.io/repos/github/eclipticrick/batch-file-renamer/badge.svg?branch=master)](https://coveralls.io/github/eclipticrick/Ecliptic-OS?branch=master)
-![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)
+[![Build Status](https://travis-ci.com/eclipticrick/batch-file-renamer.svg?branch=master)](https://travis-ci.com/eclipticrick/batch-file-renamer)
+[![Coverage Status](https://coveralls.io/repos/github/eclipticrick/batch-file-renamer/badge.svg?branch=master)](https://coveralls.io/github/eclipticrick/batch-file-renamer?branch=master)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/eclipticrick/batch-file-renamer/blob/master/LICENSE)
 
 ## Getting Started
 
@@ -30,11 +30,6 @@ Install the dependencies in the newly created folder
 ```
 cd batch-file-renamer
 npm install
-```
-
-Run the program
-```
-npm run start
 ```
 
 ## Usage
@@ -73,6 +68,10 @@ module.exports = {
 ```
 
 Run the program to rename files & folders
+
+```
+npm run start
+```
 
 ![Example GIF](https://github.com/eclipticrick/batch-file-renamer/blob/master/readme.gif?raw=true)
 
