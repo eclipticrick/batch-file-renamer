@@ -67,7 +67,7 @@ module.exports = {
 
 Run the program to rename files & folders
 
-![Example GIF](https://github.com/eclipticrick/blob/master/readme.gif?raw=true)
+![Example GIF](https://github.com/eclipticrick/batch-file-renamer/blob/master/readme.gif?raw=true)
 
 ## Authors
 
