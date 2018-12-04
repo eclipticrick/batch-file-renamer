@@ -67,7 +67,7 @@ module.exports = {
 
 Run the program to rename files & folders
 
-![Example](https://media.giphy.com/media/RMxzoQAi3QIpwUZ50T/giphy.gif)
+![Example GIF](https://github.com/eclipticrick/blob/master/readme.gif?raw=true)
 
 ## Authors
 
