@@ -13,7 +13,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 You need:
-* [NodeJS and NPM](https://nodejs.org/) to install the dependencies for this project (recommended version 6 or higher)
+* [NodeJS and NPM](https://nodejs.org/) to install the dependencies for this project (recommended NodeJS version 8 or higher)
 
 
 ### Installing
