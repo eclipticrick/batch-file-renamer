@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "jest --verbose",
-    "test:coverage": "jest --coverage",
-    "show:coverage": "start coverage/lcov-report/index.html"
+    "test:coverage": "jest --coverage"
   },
   "author": "Wesley Veenendaal",
   "license": "ISC",
