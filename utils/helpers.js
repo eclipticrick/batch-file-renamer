@@ -1,12 +1,12 @@
 const is = require('./is');
 
-const stringIsEmpty = (path) => {
+const stringIsEmpty = path => {
     is.required(path, 'path');
     is.string(path, 'path');
     return !path.replace(/\s/g, '')
 };
 
-const confirm = (input) => {
+const confirm = input => {
     is.required(input, 'input');
     is.string(input, 'input');
     input = input.toLowerCase();

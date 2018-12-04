@@ -31,7 +31,6 @@ const copyInitialState = () => ({
         folders: [...initialState.backup.folders]
     }
 });
-
 let state = copyInitialState();
 
 const clearState = () => state = copyInitialState();
@@ -43,7 +42,6 @@ const validateNewStateStructure = (stateOverwrites) => {
         }
         stateTypes[key](stateOverwrites[key]);
         if (key === 'backup') {
-
             Object.keys(stateOverwrites.backup).forEach(k => {
                 if (!Object.keys(initialState.backup).includes(k)){
                     throw new Error(`'backup.${k}' is not a valid state param!`)

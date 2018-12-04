@@ -27,7 +27,7 @@ const handlers = {
     },
 
     // Step 2
-    confirmPath: (answer) => {
+    confirmPath: answer => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
             return 3
@@ -71,7 +71,7 @@ const handlers = {
     },
 
     // Step 4
-    confirmReplaceables: (answer) => {
+    confirmReplaceables: answer => {
         const confirmation = helpers.confirm(answer);
         if (confirmation === true) {
             return 5
@@ -108,7 +108,7 @@ const handlers = {
     },
 
     // Step 6
-    setParameterForAction: (answer) => {
+    setParameterForAction: answer => {
         const args = [...getState().args];
         args.push(answer);
         setState({ args });

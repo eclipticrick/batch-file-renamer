@@ -1,14 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const hasPermissions = (dir) => {
+const hasPermissions = dir => {
     try {
 
         // The file or directory exists
         fs.accessSync(dir, fs.constants.F_OK);
-
-        // The file or directory has execute permissions
-        // fs.accessSync(dir, fs.constants.X_OK);
 
         // The file or directory has write permissions and is not in use at the moment
         fs.accessSync(dir, fs.constants.W_OK);
@@ -21,8 +18,6 @@ const hasPermissions = (dir) => {
         fs.statSync(dir);
         fs.lstatSync(dir);
 
-        // TODO: check if the file is in use / blocked
-
         return true
     }
     catch (err) {
@@ -30,14 +25,14 @@ const hasPermissions = (dir) => {
     }
 };
 
-const getFilesAndFolders = (dir) => {
+const getFilesAndFolders = dir => {
     if(!hasPermissions(dir)) return [];
     return fs.readdirSync(dir);
 };
 const isFile = (dir) => !fs.lstatSync(dir).isDirectory();
 const isDirectory = (dir) => fs.lstatSync(dir).isDirectory();
 
-const pathIsAValidFolder = (dir) => {
+const pathIsAValidFolder = dir => {
     const pathExists = fs.existsSync(dir);
     if (pathExists) {
         const pathIsAFolder = isDirectory(dir);
@@ -45,7 +40,7 @@ const pathIsAValidFolder = (dir) => {
     }
     return false
 };
-const getFolders = (dir) => {
+const getFolders = dir => {
     return getFilesAndFolders(dir).filter(name => {
         const fullPathToFileOrFolder = path.join(dir, name);
         if(hasPermissions(fullPathToFileOrFolder)) {

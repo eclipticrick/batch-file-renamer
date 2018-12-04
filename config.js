@@ -8,40 +8,40 @@
  */
 module.exports = {
     default: {
-        path: 'D:\\Projects\\npm\\batch-renamer\\tmp',
+        path: 'C:\\Temp',
         renameFolders: false,
-        renameFiles: false
+        renameFiles: true
     },
     actions: {
         replaceFirst: {
-            fn: (oldName) => (replaceString, withString) => oldName.replace(replaceString, withString),
+            fn: oldName => (replaceString, withString) => oldName.replace(replaceString, withString),
             args: ['string to replace', 'replacement string']
         },
         replace: {
-            fn: (oldName) => (replaceString, withString) => {
+            fn: oldName => (replaceString, withString) => {
                 const re = new RegExp(replaceString, 'g');
                 return oldName.replace(re, withString);
             },
             args: ['string to replace', 'replacement string']
         },
         reverse: {
-            fn: (oldName) => () => oldName.split('').reverse().join(''),
+            fn: oldName => () => oldName.split('').reverse().join(''),
             args: []
         },
         toLowerCase: {
-            fn: (oldName) => () => oldName.toLowerCase(),
+            fn: oldName => () => oldName.toLowerCase(),
             args: []
         },
         toUpperCase: {
-            fn: (oldName) => () => oldName.toUpperCase(),
+            fn: oldName => () => oldName.toUpperCase(),
             args: []
         },
         append:  {
-            fn: (oldName) => (string) => oldName + string,
+            fn: oldName => string => oldName + string,
             args: ['string to append']
         },
         prepend: {
-            fn: (oldName) => (string) => string + oldName,
+            fn: oldName => string => string + oldName,
             args: ['string to prepend']
         }
     }
